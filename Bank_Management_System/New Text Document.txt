@@ -1,0 +1,109 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "BankSystem.h"
+#include "BankSystem.c"
+
+extern char Flag_Admin_Password ;
+int main()
+{
+    Bank_Account b[Number_Of_Bank_Accounts];
+    Admin a ;
+    int Number_Of_Accounts ;
+    char Option_Mode = 0, Operation_Option, Return_Main_Menu_Flag = 0;
+    printf("1 - Admin Mode \n");
+    printf("2 - User Mode \n");
+
+    while (1)
+    {
+        if (Return_Main_Menu_Flag == 0)
+        {
+             printf("Enter Option Of Mode : ");
+             scanf("%d",&Option_Mode);
+        }
+        if (Option_Mode == 1)
+        {
+            if (Return_Main_Menu_Flag == 0)
+            {
+                 Admin_LogIn(a,1234);
+                 Admin_Window();
+            }
+            if (Flag_Admin_Password == 1)
+            {
+                Flag_Admin_Password = 0 ;
+
+                while(1 || Return_Main_Menu_Flag == 1)
+                {
+                    Return_Main_Menu_Flag = 0 ;
+                    printf("Enter Option Of Operation : ");
+                    scanf("%d",&Operation_Option);
+
+                    if (Operation_Option == 1)
+                    {
+                        printf("Enter Number Of Account That You Want to Create : ");
+                        scanf("%d",&Number_Of_Accounts);
+
+                        Create_New_Account(b, Number_Of_Accounts);
+                        break ;
+                    }
+                    else if (Operation_Option == 2)
+                    {
+                        Admin_Window();
+                        Return_Main_Menu_Flag = 1;
+                    }
+                    else if (Operation_Option == 3)
+                    {
+                        printf("Thank You  For Using Our System \n");
+                        break ;
+                    }
+                }
+                if (Operation_Option == 3)
+                    break ;
+
+            }
+            else
+            {
+                break ;
+            }
+        }
+        else if (Option_Mode == 2)
+        {
+            Client_LogIn(b);
+            Client_Window();
+
+            while(1)
+            {
+                printf("Enter Option Of Operation : ");
+                scanf("%d",&Operation_Option);
+                if (Operation_Option == 1)
+                {
+                    Make_Transaction(b);
+                    break ;
+                }
+                else if (Operation_Option == 2)
+                {
+                    Change_Account_Status(b);
+                    break ;
+                }
+                else if (Operation_Option == 3)
+                {
+                    Get_Cash(b);
+                    break ;
+                }
+                else if (Operation_Option == 4)
+                {
+                    Deposit(b);
+                    break ;
+                }
+                else if (Operation_Option == 5)
+                {
+                    Admin_Window();
+                    Return_Main_Menu_Flag = 1 ;
+                    Option_Mode = 1 ;
+                    break ;
+                }
+            }
+        }
+    }
+
+    return 0;
+}

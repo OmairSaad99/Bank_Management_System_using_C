@@ -1,0 +1,346 @@
+#include "BankSystem.h"
+#include "string.h"
+#include <stdlib.h>
+
+int AccountCounter = 0 ;
+int temp ;
+int index;
+static char Flag_Admin_Password = 0 ;
+static char Flag_Client_Password = 0 ;
+static char Flag_Client_ID = 0 ;
+
+void Admin_Window(void)
+{
+    printf("         Welcome To Admin Main Menu          \n\n");
+    printf("1 - Create New Account \n");
+    printf("2 - Return To Main Menu \n");
+    printf("3 -Change Account Status \n");
+    printf("4 - Exit System \n\n");
+}
+
+void Client_Window(void)
+{
+    printf("         Welcome To Client Main Menu          \n\n");
+    printf("1 - Make Transaction\n");
+    printf("2 - Change Account Password\n");
+    printf("3 - Get Cash\n");
+    printf("4 - Deposit in Account\n");
+}
+
+void Admin_LogIn(Admin a, int Password)
+{
+    char Number_OF_tries = 0 ;
+    printf("Enter Admin User Name : ");
+    scanf(" %[^\n]%*c", a.Name);
+    printf("Enter Admin Password : ");
+    scanf("%d",&a.Password);
+
+    while (1)
+    {
+        if (Number_OF_tries == 2 && a.Password != Password) // 0 1
+        {
+            printf("Bye Bye\n");
+            break ;
+        }
+        else
+        {
+            if (a.Password == Password)
+            {
+                printf("Welcome To Our Bank System !\n");
+                Flag_Admin_Password = 1 ;
+                break ;
+            }
+            else
+            {
+
+                printf("Wrong Password , Enter Password Again :");
+                scanf("%d", &a.Password);
+            }
+        }
+        Number_OF_tries ++ ;
+    }
+}
+
+void Client_LogIn(Bank_Account *ptb)
+{
+    char Number_OF_tries = 0 ;
+    int ID;
+    int Password ;
+    printf("Enter Client Bank Account ID : ");
+    scanf("%d", &ID);
+
+    while(1)
+    {
+        for (int i=0 ; i<AccountCounter ; i++)
+        {
+            if (ID == ptb[i].Bank_Account_ID)
+            {
+                index = i ;
+                Flag_Client_ID ++ ;
+                printf("Enter Client Bank Account Password : ") ;
+                scanf("%d",&Password);
+
+                while (1)
+                {
+                    for (int j=0 ; j<AccountCounter ; j++)
+                    {
+                        if (Password == ptb[j].Password && Password == ptb[index].Password)
+                        {
+                            Flag_Client_Password ++ ;
+                            break ;
+                        }
+                    }
+                    if (Flag_Client_Password == 1)
+                    {
+                        Flag_Client_Password = 0;
+                        break ;
+                    }
+                    else
+                    {
+                        printf("Incorrect Password\n");
+                        printf("Enter Correct Password : ");
+                        scanf("%d",&Password);
+                    }
+                }
+                break ;
+            }
+        }
+        if(Flag_Client_ID == 1)
+        {
+            Flag_Client_ID = 0 ;
+            break ;
+        }
+        else
+        {
+            printf("Incorrect ID\n");
+            printf("Enter Correct ID : ") ;
+            scanf("%d",&ID);
+        }
+    }
+
+}
+
+void Create_New_Account (Bank_Account *ptb,int Number_Of_Accounts)
+{
+    static int password_Temp, Acc_Id_Temp ;
+    temp = AccountCounter ;
+    for (int i=temp ; i<Number_Of_Accounts + temp ; i++)
+    {
+        printf("Enter Client %d Name : ", AccountCounter + 1) ;
+        scanf(" %[^\n]%*c", ptb[i].name);
+        printf("Enter Client %d Address : ", AccountCounter + 1) ;
+        scanf(" %[^\n]%*c", ptb[i].address);
+        printf("Enter Client %d Age : ", AccountCounter + 1) ;
+        scanf("%d", &ptb[i].age);
+        printf("Enter Client %d National ID : ", AccountCounter + 1) ;
+        scanf(" %[^\n]%*c", ptb[i].National_ID);
+
+        if (ptb[i].age < 21)
+        {
+            printf("Enter Client %d Guardian National ID: ", AccountCounter + 1) ;
+            scanf(" %[^\n]%*c", ptb[i].Guardian_National_ID);
+        }
+        printf("Enter Client %d Balance : ", AccountCounter + 1) ;
+        scanf("%f", &ptb[i].Balance);
+
+        strcpy(ptb[i].Account_Status,"Active");
+
+        if (AccountCounter == 0)
+        {
+            ptb[i].Password = 1000 ;
+            ptb[i].Bank_Account_ID = 1000000000;
+            password_Temp = ptb[i].Password ;
+            Acc_Id_Temp =ptb[i].Bank_Account_ID ;
+        }
+        else
+        {
+            ptb[i].Password = password_Temp + 1;
+            ptb[i].Bank_Account_ID = Acc_Id_Temp + 1 ;
+            password_Temp = ptb[i].Password ;
+            Acc_Id_Temp =ptb[i].Bank_Account_ID ;
+        }
+        AccountCounter ++ ;
+    }
+}
+
+void Make_Transaction(Bank_Account *ptb)
+{
+    int Account_ID_Transfer ;
+    static char Account_ID_Transfer_Flag = 0;
+    float Transferred_Amount ;
+
+    while (1)
+    {
+        if (strcmp(ptb[index].Account_Status, "Active") != 0)
+        {
+            printf("Account ID %d Is %s \n",ptb[index].Bank_Account_ID, ptb[index].Account_Status);
+            break ;
+        }
+        printf("Enter Bank Account ID That you Want to transfer Money To his account : ");
+        scanf("%d",&Account_ID_Transfer);
+
+        while (1)
+        {
+            for (int j=0 ; j<AccountCounter ; j++)
+            {
+                if (Account_ID_Transfer == ptb[j].Bank_Account_ID && Account_ID_Transfer != ptb[index].Bank_Account_ID)
+                {
+                    Account_ID_Transfer_Flag ++ ;
+                    if (strcmp(ptb[j].Account_Status, "Active") != 0)
+                    {
+                        printf("Account ID %d Is %s \n",ptb[j].Bank_Account_ID, ptb[j].Account_Status);
+                        break ;
+                    }
+                    printf("Enter Amount Of Money that you want to Transfer To this Account : ") ;
+                    scanf("%f", &Transferred_Amount) ;
+
+                    if (Transferred_Amount <= ptb[index].Balance)
+                    {
+                        ptb[j].Balance += Transferred_Amount ;
+                        ptb[index].Balance -= Transferred_Amount ;
+                    }
+                    else
+                    {
+                        printf("Amount Not Enough");
+                    }
+                    break ;
+                }
+            }
+            if (Account_ID_Transfer_Flag == 1)
+            {
+                Account_ID_Transfer_Flag = 0 ;
+                break ;
+            }
+            else
+            {
+                printf("You cant transfer Money to Your Self Or You may be enter Incorrect Account ID \n");
+                printf("Enter Correct Account ID : ") ;
+                scanf("%d", &Account_ID_Transfer) ;
+            }
+
+        }
+        break ;
+    }
+}
+
+
+void Change_Account_Status (Bank_Account *ptb)
+{
+    int Client_Account_ID ;
+    static char Client_Account_ID_Flag = 0 ;
+    printf("Enter Client Bank Account ID : ");
+    scanf("%d",&Client_Account_ID);
+
+    while (1)
+    {
+        for (int i=0 ; i<AccountCounter ; i++)
+        {
+            if (Client_Account_ID == ptb[i].Bank_Account_ID)
+            {
+                Client_Account_ID_Flag ++ ;
+
+                while (1)
+                {
+                    printf("Enter Status For Account Which ID %d : ",ptb[i].Bank_Account_ID);
+                    scanf(" %[^\n]%*c", ptb[i].Account_Status);
+
+                    if (strcmp(ptb[i].Account_Status, "Active") == 0 || strcmp(ptb[i].Account_Status, "Restricted") == 0 || strcmp(ptb[i].Account_Status, "Closed") == 0)
+                    {
+                        /*Do NO Thing*/
+                        break ;
+                    }
+                    else
+                    {
+                        printf("Incorrect Status \n") ;
+                    }
+                }
+                break ;
+            }
+        }
+        if (Client_Account_ID_Flag == 1)
+        {
+            Client_Account_ID_Flag = 0 ;
+            break ;
+        }
+        else
+        {
+            printf("Incorrect Account ID \n");
+            printf("Enter Correct Account ID : ") ;
+            scanf("%d", &Client_Account_ID) ;
+        }
+    }
+}
+
+void Get_Cash (Bank_Account *ptb)
+{
+    float Cash_Amount ;
+
+    printf("Enter Cash Amount You want To get From This Account : ") ;
+    scanf ("%f",&Cash_Amount) ;
+
+    if (Cash_Amount <= ptb[index].Balance)
+    {
+        ptb[index].Balance -= Cash_Amount ;
+    }
+    else
+    {
+        printf("Amount Not Enough\n");
+    }
+}
+
+void Deposit (Bank_Account *ptb)
+{
+    float Cash_Amount ;
+
+    printf("Enter Cash Amount You want To Add TO This Account : ") ;
+    scanf ("%f",&Cash_Amount) ;
+
+    ptb[index].Balance += Cash_Amount ;
+}
+
+void Change_Password(Bank_Account *ptb)
+{
+    int Old_Password ;
+    char Client_Account_Password_Flag = 0 ;
+
+    printf("Enter Old Password : ");
+    scanf("%d",&Old_Password);
+    while(1)
+    {
+        for (int j=0 ; j<AccountCounter ; j++)
+        {
+            if (Old_Password == ptb[j].Password && Old_Password == ptb[index].Password)
+            {
+                Client_Account_Password_Flag ++ ;
+                printf("Enter New Password : ");
+                scanf("%d",&ptb[j].Password);
+                break ;
+            }
+        }
+        if (Client_Account_Password_Flag == 1)
+        {
+            Client_Account_Password_Flag = 0 ;
+            break ;
+        }
+        else if (Client_Account_Password_Flag == 0)
+        {
+            printf("Incorrect Password \n");
+            printf("Enter correct Old Password : ");
+            scanf("%d",&Old_Password);
+        }
+    }
+}
+
+void print(Bank_Account *ptb)
+{
+    for (int i=0 ; i<AccountCounter ; i++)
+    {
+        printf("%s",ptb[i].name);
+        printf(" %d",ptb[i].Balance);
+        printf(" %d",ptb[i].Bank_Account_ID);
+        printf(" %d",ptb[i].Password);
+        printf(" %s",ptb[i].Account_Status);
+
+        printf("\n");
+    }
+}

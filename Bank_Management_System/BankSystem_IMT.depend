@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1687533392 source:d:\c projects\banksystem_imt\main.c
+	<stdio.h>
+	<stdlib.h>
+	"BankSystem.h"
+	"BankSystem.c"
+
+1685277948 d:\c projects\banksystem_imt\banksystem.h
+
+1703777778 d:\c projects\banksystem_imt\banksystem.c
+	"BankSystem.h"
+	"string.h"
+	<stdlib.h>
+
